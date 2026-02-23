@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { LocationPoint, calculateConfidence, calcDistance } from '../utils/Location';
-import { aiAdapter } from '../services/aiAdapter';
+import { aiAdapter, AiResult } from '../services/aiAdapter';
 
 export const router = Router();
 
@@ -27,22 +27,30 @@ function formatDuration(seconds: number): string {
 }
 
 /**
+ * 將 AI JSON 轉成自然語言 summary
+ */
+function jsonToTextSummary(aiResult: AiResult): string {
+  const { totalPoints, totalDistance, totalTime, lastLocation, anomalies } = aiResult;
+  return `設備目前共記錄 ${totalPoints} 個位置點，總距離 ${totalDistance}，總耗時 ${totalTime}，最後位置在 (${lastLocation.lat}, ${lastLocation.lng})，運動狀態: ${lastLocation.motion ? '移動' : '靜止'}，異常: ${anomalies ? '有' : '無'}。`;
+}
+
+/**
  * GET /api/v1/report/:deviceId?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
  */
 router.get('/:deviceId', async (req, res) => {
   const deviceId = Number(req.params.deviceId);
   const startDateStr = req.query.startDate as string;
-  const endDateStr   = req.query.endDate as string;
+  const endDateStr = req.query.endDate as string;
 
   if (!deviceId || !startDateStr || !endDateStr) {
     return res.status(400).json({ message: 'deviceId, startDate and endDate are required' });
   }
 
   const startDate = new Date(`${startDateStr}T00:00:00.000Z`);
-  const endDate   = new Date(`${endDateStr}T23:59:59.999Z`);
+  const endDate = new Date(`${endDateStr}T23:59:59.999Z`);
 
   try {
-    //  從 Prisma track model 取得集合
+    // 取得該設備在時間範圍內的所有 track
     const tracks = await prisma.track.findMany({
       where: { deviceId, deviceTime: { gte: startDate, lte: endDate } },
       orderBy: { deviceTime: 'asc' },
@@ -52,7 +60,7 @@ router.get('/:deviceId', async (req, res) => {
       return res.status(404).json({ message: 'No tracks found for this device and date range' });
     }
 
-    //  計算每個點的 confidence、距離、停留時間
+    // 計算每個點的 distance、duration、confidence
     let prev: LocationPoint | null = null;
     let totalDistance = 0; // km
     let totalTime = 0;     // sec
@@ -69,12 +77,10 @@ router.get('/:deviceId', async (req, res) => {
       };
 
       const { confidence } = calculateConfidence(prev, curr);
-
-      let distance = 0;
-      let duration = 0;
+      let distance = 0, duration = 0;
 
       if (prev) {
-        distance = calcDistance(prev, curr) / 1000; // 公尺 → 公里
+        distance = calcDistance(prev, curr) / 1000; // 公尺 -> 公里
         duration = (curr.timestamp.getTime() - prev.timestamp.getTime()) / 1000; // 秒
       }
 
@@ -94,42 +100,29 @@ router.get('/:deviceId', async (req, res) => {
       prev = curr;
     }
 
-    //  格式化總距離與總時間
-    const totalDistanceText = formatDistance(totalDistance);
-    const totalTimeText     = formatDuration(totalTime);
-
-    // 取得最後一筆 track
     const lastTrack = trackDetails[trackDetails.length - 1];
 
-//     //  生成 AI summary
-//     const summary = `【AI Report Summary】
-// - Total location points: ${trackDetails.length}
-// - Total distance: ${totalDistanceText}
-// - Total time: ${totalTimeText}
-// - Last known location: (${lastTrack.latitude.toFixed(5)}, ${lastTrack.longitude.toFixed(5)})
-// - Motion status: ${lastTrack.motion ? 'Moving' : 'Stationary'}
-// - Last confidence: ${lastTrack.confidence.toFixed(2)}%
-// - Tracks detail includes distance (km) and duration (s) for each point
-// - Anomalies or rapid movements are automatically flagged if confidence is low.`;
+    // 🔹 呼叫 AI Adapter (返回 JSON)
+    const aiResult: AiResult = await aiAdapter(trackDetails);
 
-    // 生成 AI summary
-    const aiResult = await aiAdapter(trackDetails);
-    const summary = aiResult.summary;
-
-    //  存入 AiReport
-    const aiReport = await prisma.aiReport.create({
+    // 🔹 存入資料庫 (summary 保存 JSON 字符串)
+    await prisma.aiReport.create({
       data: {
         deviceId,
-        total_distance: totalDistance.toFixed(3),       // km
-        total_time: Math.round(totalTime).toString(),   // sec
+        total_distance: totalDistance.toFixed(3),
+        total_time: Math.round(totalTime).toString(),
         tracks: trackDetails,
-        summary,
+        summary: JSON.stringify(aiResult),
         confidence: lastTrack.confidence,
       },
     });
 
-    //  回傳 JSON
-    res.status(200).json({ success: true, report: aiReport });
+    // 🔹 回傳自然語言 summary 給前端
+    res.status(200).json({
+      success: true,
+      summary: jsonToTextSummary(aiResult),
+      tracks: trackDetails,
+    });
 
   } catch (err) {
     console.error(err);
