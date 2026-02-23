@@ -6,6 +6,18 @@ import userRoutes from './routes/users'
 import authRoutes from './routes/auth'
 import deviceRoutes from './routes/devices'
 import aiRoutes from './routes/aiReport'  
+import 'dotenv/config';
+
+// 读取环境变量
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+const DATABASE_URL = process.env.DATABASE_URL;
+
+console.log('OPENAI_API_KEY:', OPENAI_API_KEY ? 'loaded' : 'missing');
+console.log('JWT_SECRET:', JWT_SECRET ? 'loaded' : 'missing');
+console.log('JWT_REFRESH_SECRET:', JWT_REFRESH_SECRET ? 'loaded' : 'missing');
+console.log('DATABASE_URL:', DATABASE_URL ? 'loaded' : 'missing');
 
 const app: Express = express()
 const swaggerDocument = YAML.load('./openapi.bundle.yaml')
