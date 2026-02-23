@@ -1,5 +1,6 @@
 // src/services/aiAdapter.ts
 import OpenAI from 'openai';
+import { LocationPoint, calcAvgAccuracy, getMotionStatus, getAccuracyLevel, formatDistanceKm, formatDurationSec, calculateConfidence, calcDistance } from '../utils/Location';
 
 export interface AiResult {
   totalPoints: number;
@@ -9,73 +10,64 @@ export interface AiResult {
     lat: number;
     lng: number;
     motion: boolean;
+    method?: string;
+    accuracyLevel?: string;
   };
   lastConfidence: number;
   anomalies: boolean;
+  avgAccuracy: number;
+  motionStatus: string;
 }
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 });
 
-export const aiAdapter = async (trackDetails: any[]): Promise<AiResult> => {
-  try {
-    if (!trackDetails.length) {
-      throw new Error("No track details provided to AI");
+export const aiAdapter = async (trackDetails: LocationPoint[]): Promise<AiResult> => {
+  if (!trackDetails.length) throw new Error("No track details provided to AI");
+
+  const totalPoints = trackDetails.length;
+
+  // 計算總距離和總時間
+  let totalDistanceKm = 0;
+  let totalTimeSec = 0;
+  let prev: LocationPoint | null = null;
+  for (const t of trackDetails) {
+    if (prev) {
+      const distance = calcDistance(prev, t) / 1000;
+      const duration = (t.timestamp.getTime() - prev.timestamp.getTime()) / 1000;
+      totalDistanceKm += distance;
+      totalTimeSec += duration;
     }
-
-    //  格式化 track 数据
-    const trackLines = trackDetails.map((t, i) =>
-      `${i + 1}. Time: ${t.timestamp}, Lat: ${t.latitude}, Lng: ${t.longitude}, Motion: ${t.motion}, Distance: ${t.distanceKm} km, Duration: ${t.durationSec} s, Confidence: ${t.confidence}`
-    ).join('\n');
-
-    //  构建 prompt，要求返回 JSON
-    const prompt = `
-You are an AI assistant. Analyze the following device track data and generate a JSON summary.
-Input track data:
-${trackLines}
-
-Output JSON with the following fields:
-{
-  "totalPoints": number,                   // total number of points
-  "totalDistance": string,                 // formatted like "1 km 234 m"
-  "totalTime": string,                     // formatted like "1h 23m 45s"
-  "lastLocation": { "lat": number, "lng": number, "motion": boolean },
-  "lastConfidence": number,               // confidence of the last track
-  "anomalies": boolean                     // true if lastConfidence < 70%
-}
-
-Ensure the output is valid JSON and do NOT include any extra text.
-`;
-
-    console.log('🔹 Calling OpenAI...');
-    const start = Date.now();
-
-    const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo', // 或 gpt-4
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.5,
-      max_tokens: 500,
-    });
-
-    const duration = Date.now() - start;
-    console.log(` OpenAI call SUCCESS (${duration}ms)`);
-
-    const raw = response.choices?.[0]?.message?.content?.trim() || '';
-    let result: AiResult;
-
-    try {
-      result = JSON.parse(raw);
-    } catch (err) {
-      console.error(' Failed to parse AI response as JSON');
-      console.error('AI raw response:', raw);
-      throw err;
-    }
-
-    return result;
-  } catch (error: any) {
-    console.error(' OpenAI call FAILED');
-    console.error(error?.message || error);
-    throw error;
+    prev = t;
   }
+
+  const lastPoint = trackDetails[trackDetails.length - 1];
+  const lastConfidence = trackDetails.length >= 2
+    ? calculateConfidence(trackDetails[trackDetails.length - 2], lastPoint).confidence
+    : 100;
+
+  const avgAccuracy = Math.round(calcAvgAccuracy(trackDetails));
+  const motionStatus = getMotionStatus(trackDetails);
+  const anomalies = lastConfidence < 70;
+  const accuracyLevel = getAccuracyLevel(lastPoint.accuracy);
+
+  const aiResult: AiResult = {
+    totalPoints,
+    totalDistance: formatDistanceKm(totalDistanceKm),
+    totalTime: formatDurationSec(totalTimeSec),
+    lastLocation: {
+      lat: lastPoint.latitude,
+      lng: lastPoint.longitude,
+      motion: lastPoint.motion,
+      method: lastPoint.method,
+      accuracyLevel,
+    },
+    lastConfidence,
+    anomalies,
+    avgAccuracy,
+    motionStatus,
+  };
+
+  return aiResult;
 };

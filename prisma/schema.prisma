@@ -59,10 +59,7 @@ model Track {
 
 model AiReport {
   id          Int      @id @default(autoincrement())
-  deviceId    Int
-  total_distance    String
-  total_time  String
-  tracks      Json      
+  deviceId    Int      
   summary     String    
   confidence  Float     
   createdAt   DateTime  @default(now())

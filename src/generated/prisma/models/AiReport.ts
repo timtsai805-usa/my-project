@@ -41,8 +41,6 @@ export type AiReportSumAggregateOutputType = {
 export type AiReportMinAggregateOutputType = {
   id: number | null
   deviceId: number | null
-  total_distance: string | null
-  total_time: string | null
   summary: string | null
   confidence: number | null
   createdAt: Date | null
@@ -51,8 +49,6 @@ export type AiReportMinAggregateOutputType = {
 export type AiReportMaxAggregateOutputType = {
   id: number | null
   deviceId: number | null
-  total_distance: string | null
-  total_time: string | null
   summary: string | null
   confidence: number | null
   createdAt: Date | null
@@ -61,9 +57,6 @@ export type AiReportMaxAggregateOutputType = {
 export type AiReportCountAggregateOutputType = {
   id: number
   deviceId: number
-  total_distance: number
-  total_time: number
-  tracks: number
   summary: number
   confidence: number
   createdAt: number
@@ -86,8 +79,6 @@ export type AiReportSumAggregateInputType = {
 export type AiReportMinAggregateInputType = {
   id?: true
   deviceId?: true
-  total_distance?: true
-  total_time?: true
   summary?: true
   confidence?: true
   createdAt?: true
@@ -96,8 +87,6 @@ export type AiReportMinAggregateInputType = {
 export type AiReportMaxAggregateInputType = {
   id?: true
   deviceId?: true
-  total_distance?: true
-  total_time?: true
   summary?: true
   confidence?: true
   createdAt?: true
@@ -106,9 +95,6 @@ export type AiReportMaxAggregateInputType = {
 export type AiReportCountAggregateInputType = {
   id?: true
   deviceId?: true
-  total_distance?: true
-  total_time?: true
-  tracks?: true
   summary?: true
   confidence?: true
   createdAt?: true
@@ -204,9 +190,6 @@ export type AiReportGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type AiReportGroupByOutputType = {
   id: number
   deviceId: number
-  total_distance: string
-  total_time: string
-  tracks: runtime.JsonValue
   summary: string
   confidence: number
   createdAt: Date
@@ -238,9 +221,6 @@ export type AiReportWhereInput = {
   NOT?: Prisma.AiReportWhereInput | Prisma.AiReportWhereInput[]
   id?: Prisma.IntFilter<"AiReport"> | number
   deviceId?: Prisma.IntFilter<"AiReport"> | number
-  total_distance?: Prisma.StringFilter<"AiReport"> | string
-  total_time?: Prisma.StringFilter<"AiReport"> | string
-  tracks?: Prisma.JsonFilter<"AiReport">
   summary?: Prisma.StringFilter<"AiReport"> | string
   confidence?: Prisma.FloatFilter<"AiReport"> | number
   createdAt?: Prisma.DateTimeFilter<"AiReport"> | Date | string
@@ -249,9 +229,6 @@ export type AiReportWhereInput = {
 export type AiReportOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   deviceId?: Prisma.SortOrder
-  total_distance?: Prisma.SortOrder
-  total_time?: Prisma.SortOrder
-  tracks?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -263,9 +240,6 @@ export type AiReportWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.AiReportWhereInput[]
   NOT?: Prisma.AiReportWhereInput | Prisma.AiReportWhereInput[]
   deviceId?: Prisma.IntFilter<"AiReport"> | number
-  total_distance?: Prisma.StringFilter<"AiReport"> | string
-  total_time?: Prisma.StringFilter<"AiReport"> | string
-  tracks?: Prisma.JsonFilter<"AiReport">
   summary?: Prisma.StringFilter<"AiReport"> | string
   confidence?: Prisma.FloatFilter<"AiReport"> | number
   createdAt?: Prisma.DateTimeFilter<"AiReport"> | Date | string
@@ -274,9 +248,6 @@ export type AiReportWhereUniqueInput = Prisma.AtLeast<{
 export type AiReportOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   deviceId?: Prisma.SortOrder
-  total_distance?: Prisma.SortOrder
-  total_time?: Prisma.SortOrder
-  tracks?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -293,9 +264,6 @@ export type AiReportScalarWhereWithAggregatesInput = {
   NOT?: Prisma.AiReportScalarWhereWithAggregatesInput | Prisma.AiReportScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"AiReport"> | number
   deviceId?: Prisma.IntWithAggregatesFilter<"AiReport"> | number
-  total_distance?: Prisma.StringWithAggregatesFilter<"AiReport"> | string
-  total_time?: Prisma.StringWithAggregatesFilter<"AiReport"> | string
-  tracks?: Prisma.JsonWithAggregatesFilter<"AiReport">
   summary?: Prisma.StringWithAggregatesFilter<"AiReport"> | string
   confidence?: Prisma.FloatWithAggregatesFilter<"AiReport"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AiReport"> | Date | string
@@ -303,9 +271,6 @@ export type AiReportScalarWhereWithAggregatesInput = {
 
 export type AiReportCreateInput = {
   deviceId: number
-  total_distance: string
-  total_time: string
-  tracks: Prisma.JsonNullValueInput | runtime.InputJsonValue
   summary: string
   confidence: number
   createdAt?: Date | string
@@ -314,9 +279,6 @@ export type AiReportCreateInput = {
 export type AiReportUncheckedCreateInput = {
   id?: number
   deviceId: number
-  total_distance: string
-  total_time: string
-  tracks: Prisma.JsonNullValueInput | runtime.InputJsonValue
   summary: string
   confidence: number
   createdAt?: Date | string
@@ -324,9 +286,6 @@ export type AiReportUncheckedCreateInput = {
 
 export type AiReportUpdateInput = {
   deviceId?: Prisma.IntFieldUpdateOperationsInput | number
-  total_distance?: Prisma.StringFieldUpdateOperationsInput | string
-  total_time?: Prisma.StringFieldUpdateOperationsInput | string
-  tracks?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   confidence?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -335,9 +294,6 @@ export type AiReportUpdateInput = {
 export type AiReportUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   deviceId?: Prisma.IntFieldUpdateOperationsInput | number
-  total_distance?: Prisma.StringFieldUpdateOperationsInput | string
-  total_time?: Prisma.StringFieldUpdateOperationsInput | string
-  tracks?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   confidence?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -346,9 +302,6 @@ export type AiReportUncheckedUpdateInput = {
 export type AiReportCreateManyInput = {
   id?: number
   deviceId: number
-  total_distance: string
-  total_time: string
-  tracks: Prisma.JsonNullValueInput | runtime.InputJsonValue
   summary: string
   confidence: number
   createdAt?: Date | string
@@ -356,9 +309,6 @@ export type AiReportCreateManyInput = {
 
 export type AiReportUpdateManyMutationInput = {
   deviceId?: Prisma.IntFieldUpdateOperationsInput | number
-  total_distance?: Prisma.StringFieldUpdateOperationsInput | string
-  total_time?: Prisma.StringFieldUpdateOperationsInput | string
-  tracks?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   confidence?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -367,9 +317,6 @@ export type AiReportUpdateManyMutationInput = {
 export type AiReportUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   deviceId?: Prisma.IntFieldUpdateOperationsInput | number
-  total_distance?: Prisma.StringFieldUpdateOperationsInput | string
-  total_time?: Prisma.StringFieldUpdateOperationsInput | string
-  tracks?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   confidence?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -378,9 +325,6 @@ export type AiReportUncheckedUpdateManyInput = {
 export type AiReportCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   deviceId?: Prisma.SortOrder
-  total_distance?: Prisma.SortOrder
-  total_time?: Prisma.SortOrder
-  tracks?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -395,8 +339,6 @@ export type AiReportAvgOrderByAggregateInput = {
 export type AiReportMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   deviceId?: Prisma.SortOrder
-  total_distance?: Prisma.SortOrder
-  total_time?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -405,8 +347,6 @@ export type AiReportMaxOrderByAggregateInput = {
 export type AiReportMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   deviceId?: Prisma.SortOrder
-  total_distance?: Prisma.SortOrder
-  total_time?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -431,9 +371,6 @@ export type FloatFieldUpdateOperationsInput = {
 export type AiReportSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   deviceId?: boolean
-  total_distance?: boolean
-  total_time?: boolean
-  tracks?: boolean
   summary?: boolean
   confidence?: boolean
   createdAt?: boolean
@@ -442,9 +379,6 @@ export type AiReportSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type AiReportSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   deviceId?: boolean
-  total_distance?: boolean
-  total_time?: boolean
-  tracks?: boolean
   summary?: boolean
   confidence?: boolean
   createdAt?: boolean
@@ -453,9 +387,6 @@ export type AiReportSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type AiReportSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   deviceId?: boolean
-  total_distance?: boolean
-  total_time?: boolean
-  tracks?: boolean
   summary?: boolean
   confidence?: boolean
   createdAt?: boolean
@@ -464,15 +395,12 @@ export type AiReportSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type AiReportSelectScalar = {
   id?: boolean
   deviceId?: boolean
-  total_distance?: boolean
-  total_time?: boolean
-  tracks?: boolean
   summary?: boolean
   confidence?: boolean
   createdAt?: boolean
 }
 
-export type AiReportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "deviceId" | "total_distance" | "total_time" | "tracks" | "summary" | "confidence" | "createdAt", ExtArgs["result"]["aiReport"]>
+export type AiReportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "deviceId" | "summary" | "confidence" | "createdAt", ExtArgs["result"]["aiReport"]>
 
 export type $AiReportPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AiReport"
@@ -480,9 +408,6 @@ export type $AiReportPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     deviceId: number
-    total_distance: string
-    total_time: string
-    tracks: runtime.JsonValue
     summary: string
     confidence: number
     createdAt: Date
@@ -911,9 +836,6 @@ export interface Prisma__AiReportClient<T, Null = never, ExtArgs extends runtime
 export interface AiReportFieldRefs {
   readonly id: Prisma.FieldRef<"AiReport", 'Int'>
   readonly deviceId: Prisma.FieldRef<"AiReport", 'Int'>
-  readonly total_distance: Prisma.FieldRef<"AiReport", 'String'>
-  readonly total_time: Prisma.FieldRef<"AiReport", 'String'>
-  readonly tracks: Prisma.FieldRef<"AiReport", 'Json'>
   readonly summary: Prisma.FieldRef<"AiReport", 'String'>
   readonly confidence: Prisma.FieldRef<"AiReport", 'Float'>
   readonly createdAt: Prisma.FieldRef<"AiReport", 'DateTime'>
