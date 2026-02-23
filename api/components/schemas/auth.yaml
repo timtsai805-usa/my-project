@@ -1,0 +1,107 @@
+
+LoginRequest:
+  type: object
+  properties:
+    identifier:
+      type: string
+      description: Email or Phone Number
+      minLength: 3
+      maxLength: 100
+    password:
+      type: string
+      format: password
+      minLength: 8
+      maxLength: 128
+    role:
+      type: string
+      enum: [user, business]
+  required:
+    - identifier
+    - password
+    - role
+
+LoginResponse:
+  type: object
+  properties:
+    accessToken:
+      type: string
+      description: "JWT access token for authenticated requests"
+    accessTokenExpiresIn:
+      type: integer
+      description: "Access token expiration time in seconds"
+    refreshToken:
+      type: string
+      description: "Token used to obtain a new access token"
+    refreshTokenExpiresIn:
+      type: integer
+      description: "Refresh token expiration time in seconds"
+  required:
+    - accessToken
+    - accessTokenExpiresIn
+    - refreshToken
+    - refreshTokenExpiresIn
+
+RegisterRequest:
+  type: object
+  properties:
+    identifier:
+      type: string
+      description: Email or Phone Number
+      minLength: 3
+      maxLength: 100
+    password:
+      type: string
+      format: password
+      minLength: 8
+      maxLength: 128
+    name:
+      type: string
+      minLength: 1
+      maxLength: 100
+    role:
+      type: string
+      enum: [user, business]
+  required:
+    - identifier
+    - password
+    - name
+    - role
+
+RegisterResponse:
+  type: object
+  properties:
+    message:
+      type: string
+      example: User Registered Successfully.
+  required:
+    - message
+
+RefreshTokenRequest:
+  type: object
+  properties:
+    refreshToken:
+      type: string
+      description: "Refresh token issued at login"
+  required:
+    - refreshToken
+
+RefreshTokenResponse:
+  type: object
+  properties:
+    accessToken:
+      type: string
+      description: "New JWT access token"
+    accessTokenExpiresIn:
+      type: integer
+      description: "Access token expiration time in seconds"
+    refreshToken:
+      type: string
+      description: "New refresh token (optional, can reuse old one)"
+    refreshTokenExpiresIn:
+      type: integer
+      description: "Refresh token expiration time in seconds"
+  required:
+    - accessToken
+    - accessTokenExpiresIn
+    - refreshToken
+    - refreshTokenExpiresIn

@@ -1,0 +1,624 @@
+openapi: 3.0.0
+info:
+  title: My-API
+  version: 1.0.0
+servers:
+  - url: 'http://100.50.103.116:3000'
+paths:
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Auth
+      security: []
+      summary: User login
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: User login successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Invalid request data
+        '401':
+          description: Unauthorized
+        '429':
+          description: Too many requests
+  /api/v1/auth/register:
+    post:
+      tags:
+        - Auth
+      security: []
+      summary: User register
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Invalid request data
+        '409':
+          description: User already exists
+        '500':
+          description: Server error
+  /api/v1/auth/refreshToken:
+    post:
+      tags:
+        - Auth
+      security: []
+      summary: Refresh access token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Access token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshTokenResponse'
+        '400':
+          description: Invalid request data
+        '401':
+          description: Unauthorized (invalid or expired refresh token)
+        '429':
+          description: Too many requests
+  /api/v1/users/me:
+    get:
+      tags:
+        - User
+      summary: Retrieve user information
+      operationId: GetUser
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request data
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+    put:
+      tags:
+        - User
+      summary: Update user information
+      operationId: UpdateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request data
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  /api/v1/devices:
+    post:
+      tags:
+        - Device
+      summary: Create device
+      operationId: CreateDevice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDevice'
+      responses:
+        '201':
+          description: Device created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '400':
+          description: Invalid request data
+        '500':
+          description: Server error
+    get:
+      tags:
+        - Device
+      summary: Retrieve device list
+      operationId: GetDeviceList
+      responses:
+        '200':
+          description: Device list retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+        '400':
+          description: Invalid request data
+        '500':
+          description: Server error
+  '/api/v1/devices/{deviceId}':
+    get:
+      tags:
+        - Device
+      summary: Retrieve device
+      operationId: GetDevice
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Device retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '400':
+          description: Invalid request data
+        '500':
+          description: Server error
+    put:
+      tags:
+        - Device
+      summary: Update device
+      operationId: UpdateDevice
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDevice'
+      responses:
+        '200':
+          description: Device updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '400':
+          description: Invalid request data
+        '500':
+          description: Server error
+    delete:
+      tags:
+        - Device
+      summary: Delete device
+      operationId: DeleteDevice
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Device deleted successfully
+        '400':
+          description: Invalid request data
+        '500':
+          description: Server error
+  '/api/v1/devices/{deviceId}/track':
+    get:
+      tags:
+        - Device
+      summary: Retrieve tracks history
+      operationId: GetDeviceTrack
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Device track retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackListResponse'
+        '400':
+          description: Invalid request data
+        '500':
+          description: Server error
+  '/api/v1/report/{deviceId}':
+    get:
+      tags:
+        - AI
+      summary: Generate AI report
+      description: Generate AI reoirt about device operation
+      operationId: getAiReport
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: AI report genereated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: Email or Phone Number
+          minLength: 3
+          maxLength: 100
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 128
+        role:
+          type: string
+          enum:
+            - user
+            - business
+      required:
+        - identifier
+        - password
+        - role
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token for authenticated requests
+        accessTokenExpiresIn:
+          type: integer
+          description: Access token expiration time in seconds
+        refreshToken:
+          type: string
+          description: Token used to obtain a new access token
+        refreshTokenExpiresIn:
+          type: integer
+          description: Refresh token expiration time in seconds
+      required:
+        - accessToken
+        - accessTokenExpiresIn
+        - refreshToken
+        - refreshTokenExpiresIn
+    RegisterRequest:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: Email or Phone Number
+          minLength: 3
+          maxLength: 100
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 128
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        role:
+          type: string
+          enum:
+            - user
+            - business
+      required:
+        - identifier
+        - password
+        - name
+        - role
+    RegisterResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: User Registered Successfully.
+      required:
+        - message
+    RefreshTokenRequest:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+          description: Refresh token issued at login
+      required:
+        - refreshToken
+    RefreshTokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: New JWT access token
+        accessTokenExpiresIn:
+          type: integer
+          description: Access token expiration time in seconds
+        refreshToken:
+          type: string
+          description: 'New refresh token (optional, can reuse old one)'
+        refreshTokenExpiresIn:
+          type: integer
+          description: Refresh token expiration time in seconds
+      required:
+        - accessToken
+        - accessTokenExpiresIn
+        - refreshToken
+        - refreshTokenExpiresIn
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        identifier:
+          type: string
+          pattern: '^[\w\.-]+@[\w\.-]+\.\w{2,}$|^\+?[0-9]{7,15}$'
+        password:
+          type: string
+        role:
+          type: string
+        apiKey:
+          type: string
+          description: User-specific API key
+        accessToken:
+          type: string
+          description: JWT or token for accessing APIs
+        refreshToken:
+          type: string
+          description: Token used to refresh accessToken
+      required:
+        - id
+        - name
+        - identifier
+        - role
+    CreateUser:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        password:
+          type: string
+          format: password
+      required:
+        - name
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        imei:
+          type: string
+          minLength: 15
+          maxLength: 100
+        iccid:
+          type: string
+          minLength: 15
+          maxLength: 100
+          nullable: true
+        operator:
+          type: string
+        rsrp:
+          type: string
+        battery:
+          type: number
+          minLength: 0
+          maxLength: 100
+          nullable: true
+        charging:
+          type: boolean
+        method:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        accuracy:
+          type: number
+          format: double
+          nullable: true
+        macs:
+          type: string
+          minLength: 0
+          maxLength: 100
+          nullable: true
+        deviceTime:
+          type: string
+          example: '2026-01-22 11:22:33'
+          nullable: true
+        motion:
+          type: boolean
+      required:
+        - imei
+        - iccid
+        - operator
+        - rsrp
+        - battery
+        - charging
+        - method
+        - latitude
+        - longitude
+        - accuracy
+        - macs
+        - deviceTime
+        - motion
+    CreateDevice:
+      type: object
+      properties:
+        imei:
+          type: string
+          minLength: 15
+          maxLength: 100
+      required:
+        - imei
+    UpdateDevice:
+      type: object
+      properties:
+        rsrp:
+          type: string
+        battery:
+          type: number
+          minLength: 0
+          maxLength: 100
+          nullable: true
+        charging:
+          type: boolean
+        method:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        accuracy:
+          type: number
+          format: double
+          nullable: true
+        macs:
+          type: string
+          minLength: 0
+          maxLength: 100
+          nullable: true
+        deviceTime:
+          type: string
+          example: '2026-01-22 11:22:33'
+          nullable: true
+        motion:
+          type: boolean
+      required:
+        - battery
+        - charging
+        - method
+        - latitude
+        - longitude
+        - accuracy
+        - macs
+        - deviceTime
+        - motion
+    TrackListResponse:
+      type: object
+      properties:
+        total_count:
+          type: integer
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              latitude:
+                type: number
+                format: double
+              longitude:
+                type: number
+                format: double
+              timestamp:
+                type: string
+                example: '2026-01-22 11:22:33'
+                nullable: true
+            required:
+              - latitude
+              - longitude
+              - deviceTime
+      required:
+        - total_count
+        - data
+    ReportResponse:
+      type: object
+      required:
+        - text
+      properties:
+        summary:
+          type: string
+        usage:
+          type: object
+          properties:
+            prompt_tokens:
+              type: integer
+            completion_tokens:
+              type: integer
+            total_tokens:
+              type: integer
+security:
+  - BearerAuth: []

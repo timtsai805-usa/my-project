@@ -1,0 +1,32 @@
+  report:
+    get:
+      tags: 
+        - AI
+      summary: Generate AI report
+      description: Generate AI reoirt about device operation
+      operationId: getAiReport
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: AI report genereated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/ai.yaml#/ReportResponse'

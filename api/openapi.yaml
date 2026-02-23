@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  title: My-API
+  version: 1.0.0
+
+servers:
+  - url: http://100.50.103.116:3000
+
+paths:
+  $ref: './paths/index.yaml'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      $ref: './components/security.yaml#/BearerAuth'
+  schemas:
+    LoginRequest:
+      $ref: './components/schemas/auth.yaml#/LoginRequest'
+    LoginResponse:
+      $ref: './components/schemas/auth.yaml#/LoginResponse'
+    RegisterRequest:
+      $ref: './components/schemas/auth.yaml#/RegisterRequest'
+    RegisterResponse:
+      $ref: './components/schemas/auth.yaml#/RegisterResponse'
+    RefreshTokenRequest:
+      $ref: './components/schemas/auth.yaml#/RefreshTokenRequest'
+    RefreshTokenResponse:
+      $ref: './components/schemas/auth.yaml#/RefreshTokenResponse'
+    
+    User:
+      $ref: './components/schemas/users.yaml#/User'
+    CreateUser:
+      $ref: './components/schemas/users.yaml#/UpdateUser'
+    Device:
+      $ref: './components/schemas/devices.yaml#/Device'
+    CreateDevice:
+      $ref: './components/schemas/devices.yaml#/CreateDevice'
+    UpdateDevice:
+      $ref: './components/schemas/devices.yaml#/UpdateDevice'
+    TrackListResponse:
+      $ref: './components/schemas/devices.yaml#/TrackListResponse'
+
+    ReportResponse:
+      $ref: './components/schemas/ai.yaml#/ReportResponse'
+
+security:
+  - BearerAuth: []

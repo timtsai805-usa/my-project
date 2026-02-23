@@ -1,0 +1,147 @@
+devices:
+  post:
+    tags:
+      - Device
+    summary: Create device
+    operationId: CreateDevice
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/devices.yaml#/CreateDevice'
+    responses:
+      '201':
+        description: Device created successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/devices.yaml#/Device'
+      '400':
+        description: Invalid request data
+      '500':
+        description: Server error
+  get:
+    tags:
+      - Device
+    summary: Retrieve device list
+    operationId: GetDeviceList
+    responses:
+      '200':
+       description: Device list retrieved successfully
+       content:
+         application/json:
+          schema:
+            type: array
+            items:
+             $ref: '../components/schemas/devices.yaml#/Device'
+      '400':
+       description: Invalid request data
+      '500':
+       description: Server error
+
+deviceById:
+  get:
+    tags:
+      - Device
+    summary: Retrieve device
+    operationId: GetDevice
+    parameters:
+      - name: deviceId
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+       description: Device retrieved successfully
+       content:
+         application/json:
+          schema:
+           $ref: '../components/schemas/devices.yaml#/Device'
+      '400':
+       description: Invalid request data
+      '500':
+       description: Server error
+  put:
+    tags:
+      - Device
+    summary: Update device
+    operationId: UpdateDevice
+    parameters:
+      - name: deviceId
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/devices.yaml#/UpdateDevice'
+    responses:
+      '200':
+       description: Device updated successfully
+       content:
+         application/json:
+          schema:
+             $ref: '../components/schemas/devices.yaml#/Device'
+      '400':
+       description: Invalid request data
+      '500':
+       description: Server error
+  delete:
+    tags:
+      - Device
+    summary: Delete device
+    operationId: DeleteDevice
+    parameters:
+      - name: deviceId
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+       description: Device deleted successfully
+      '400':
+       description: Invalid request data
+      '500':
+       description: Server error
+
+deviceTrack:
+  get:
+    tags:
+      - Device
+    summary: Retrieve tracks history
+    operationId: GetDeviceTrack
+    parameters:
+      - name: deviceId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: startDate
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: endDate
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+    responses:
+      '200':
+       description: Device track retrieved successfully
+       content:
+         application/json:
+          schema:
+           $ref: '../components/schemas/devices.yaml#/TrackListResponse'
+      '400':
+       description: Invalid request data
+      '500':
+       description: Server error

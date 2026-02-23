@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  user
+  business
+}
+
+model User {
+  id           String   @id @default(uuid())          
+  identifier   String   @unique                      
+  name         String                                  
+  password     String                                 
+  role         Role
+  apiKey       String?  @db.Text                       
+  accessToken  String?  @db.Text                       
+  refreshToken String?  @db.Text                       
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Device model
+model Device {
+  id         Int      @id @default(autoincrement())
+  imei       String   @unique
+  iccid      String?  
+  operator   String?   
+  rsrp       String?   
+  battery       Float?  
+  charging      Boolean? 
+  method        String?   
+  latitude      Float?  
+  longitude     Float?  
+  accuracy      Float?  
+  macs          String?  @default("")
+  deviceTime    DateTime?  @default(now())
+  motion        Boolean?  
+}
+
+// Track model
+model Track {
+  id         Int      @id @default(autoincrement())
+  deviceId   Int
+  method     String?  
+  latitude   Float?  
+  longitude  Float?  
+  accuracy   Float?  
+  deviceTime DateTime?
+  motion     Boolean?
+
+  @@index([deviceId])
+}
+
+model AiReport {
+  id          Int      @id @default(autoincrement())
+  deviceId    Int
+  total_distance    String
+  total_time  String
+  tracks      Json      
+  summary     String    
+  confidence  Float     
+  createdAt   DateTime  @default(now())
+
+  @@index([deviceId])
+}

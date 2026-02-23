@@ -1,0 +1,44 @@
+User:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+    name:
+      type: string
+      minLength: 1
+      maxLength: 100
+    identifier:
+      type: string
+      pattern: '^[\w\.-]+@[\w\.-]+\.\w{2,}$|^\+?[0-9]{7,15}$'
+    password:
+      type: string
+    role:
+      type: string
+    apiKey:
+      type: string
+      description: "User-specific API key"
+    accessToken:
+      type: string
+      description: "JWT or token for accessing APIs"
+    refreshToken:
+      type: string
+      description: "Token used to refresh accessToken"
+  required:
+    - id
+    - name
+    - identifier
+    - role
+
+UpdateUser:
+  type: object
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 100
+    password:
+      type: string
+      format: password
+  required:
+    - name

@@ -1,0 +1,152 @@
+Device:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+    imei:
+      type: string
+      minLength: 15
+      maxLength: 100
+    iccid:
+      type: string
+      minLength: 15
+      maxLength: 100
+      nullable: true
+    operator:
+      type: string
+    rsrp:
+      type: string
+    battery:
+      type: number
+      minLength: 0
+      maxLength: 100
+      nullable: true
+    charging:
+      type: boolean
+    method:
+      type: string
+      nullable: true
+    latitude:
+      type: number
+      format: double
+    longitude:
+      type: number
+      format: double
+    accuracy:
+      type: number
+      format: double
+      nullable: true
+    macs:
+      type: string
+      minLength: 0
+      maxLength: 100
+      nullable: true
+    deviceTime:
+      type: string
+      example: "2026-01-22 11:22:33"
+      nullable: true
+    motion:
+      type: boolean
+  required:
+    - imei
+    - iccid
+    - operator
+    - rsrp
+    - battery
+    - charging
+    - method
+    - latitude
+    - longitude
+    - accuracy
+    - macs
+    - deviceTime
+    - motion
+
+CreateDevice:
+  type: object
+  properties:
+    imei:
+      type: string
+      minLength: 15
+      maxLength: 100
+  required:
+    - imei
+
+UpdateDevice:
+  type: object
+  properties:
+    rsrp:
+      type: string
+    battery:
+      type: number
+      minLength: 0
+      maxLength: 100
+      nullable: true
+    charging:
+      type: boolean
+    method:
+      type: string
+      nullable: true
+    latitude:
+      type: number
+      format: double
+    longitude:
+      type: number
+      format: double
+    accuracy:
+      type: number
+      format: double
+      nullable: true
+    macs:
+      type: string
+      minLength: 0
+      maxLength: 100
+      nullable: true
+    deviceTime:
+      type: string
+      example: "2026-01-22 11:22:33"
+      nullable: true
+    motion:
+      type: boolean
+  required:
+    - battery
+    - charging
+    - method
+    - latitude
+    - longitude
+    - accuracy
+    - macs
+    - deviceTime
+    - motion
+
+Track:
+  type: object
+  properties:
+    latitude:
+      type: number
+      format: double
+    longitude:
+      type: number
+      format: double
+    timestamp:
+      type: string
+      example: "2026-01-22 11:22:33"
+      nullable: true
+  required:
+    - latitude
+    - longitude
+    - deviceTime
+
+TrackListResponse:
+  type: object
+  properties:
+    total_count:
+      type: integer
+    data:
+      type: array
+      items:
+        $ref: '#/Track'
+  required:
+    - total_count
+    - data
