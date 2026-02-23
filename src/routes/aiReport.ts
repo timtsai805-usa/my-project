@@ -1,71 +1,61 @@
 // src/routes/aiReport.ts
+
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
-import { LocationPoint, calculateConfidence, generateTimeline } from '../utils/Location';
+import {
+  LocationPoint,
+  calculateConfidence,
+  generateTimeline
+} from '../utils/Location';
 import { aiAdapter, AiResult } from '../services/aiAdapter';
 
 export const router = Router();
 
-/** 生成自然語言 summary */
-function jsonToTextSummary(aiResult: AiResult, timeline: string[]): string {
-  const {
-    totalPoints,
-    totalDistance,
-    totalTime,
-    lastLocation,
-    anomalies,
-    avgAccuracy,
-    motionStatus,
-  } = aiResult;
-
-  return `
-📍 設備總覽：
-- 記錄位置點：${totalPoints}
-- 總距離：${totalDistance}
-- 總耗時：${totalTime}
-- 平均精度：${avgAccuracy} m
-- 運動狀態：${motionStatus}
-- 異常狀態：${anomalies ? '有' : '無'}
-- 移動預覽：You have been moving total distance ${totalDistance} in ${totalTime}
-
-🕒 軌跡時間軸：
-${timeline.join('\n')}
-
-🗺️ 最後位置：
-- 緯度/經度：${lastLocation.lat}, ${lastLocation.lng}
-- 定位模式：${lastLocation.method?.toUpperCase() ?? 'Unknown'}
-- 定位精度：${lastLocation.accuracyLevel ?? 'Unknown'}
-- 異常狀態：${anomalies ? '有' : '無'}
-  `.trim();
-}
-
-/** GET /api/v1/report/:deviceId?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD */
+/**
+ * GET /api/v1/report/:deviceId?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
+ */
 router.get('/:deviceId', async (req, res) => {
   const deviceId = Number(req.params.deviceId);
   const startDateStr = req.query.startDate as string;
   const endDateStr = req.query.endDate as string;
 
   if (!deviceId || !startDateStr || !endDateStr) {
-    return res.status(400).json({ message: 'deviceId, startDate and endDate are required' });
+    return res.status(400).json({
+      message: 'deviceId, startDate and endDate are required',
+    });
   }
 
   const startDate = new Date(`${startDateStr}T00:00:00.000Z`);
   const endDate = new Date(`${endDateStr}T23:59:59.999Z`);
 
   try {
-    // 取得該設備在時間範圍內的 track
+    //  取得資料
     const tracks = await prisma.track.findMany({
-      where: { deviceId, deviceTime: { gte: startDate, lte: endDate } },
+      where: {
+        deviceId,
+        deviceTime: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
       orderBy: { deviceTime: 'asc' },
     });
 
     if (!tracks.length) {
-      return res.status(404).json({ message: 'No tracks found for this device and date range' });
+      return res.status(404).json({
+        message: 'No tracks found for this device and date range',
+      });
     }
 
+    //  轉成 LocationPoint[]
     const points: LocationPoint[] = tracks
-      .filter(t => t.latitude != null && t.longitude != null && t.deviceTime != null)
-      .map(t => ({
+      .filter(
+        (t) =>
+          t.latitude != null &&
+          t.longitude != null &&
+          t.deviceTime != null
+      )
+      .map((t) => ({
         latitude: t.latitude!,
         longitude: t.longitude!,
         timestamp: t.deviceTime!,
@@ -74,35 +64,61 @@ router.get('/:deviceId', async (req, res) => {
         accuracy: t.accuracy ?? undefined,
       }));
 
-    const lastPoint = points[points.length - 1];
-    const lastConfidence = points.length >= 2
-      ? calculateConfidence(points[points.length - 2], lastPoint).confidence
-      : 100;
+    if (!points.length) {
+      return res.status(404).json({
+        message: 'No valid location points found',
+      });
+    }
 
-    // 呼叫 AI Adapter
+    //  計算最後 confidence
+    const lastPoint = points[points.length - 1];
+    const lastConfidence =
+      points.length >= 2
+        ? calculateConfidence(
+            points[points.length - 2],
+            lastPoint
+          ).confidence
+        : 100;
+
+    //  呼叫 AI
     const aiResult: AiResult = await aiAdapter(points);
 
-    // 生成時間軸
+    //  產生時間軸（純演算法）
     const timeline = generateTimeline(points);
 
-    // 存入資料庫
+    //  存入資料庫（只存 structured）
     await prisma.aiReport.create({
       data: {
         deviceId,
-        summary: JSON.stringify(aiResult),
+        summary: JSON.stringify({
+          ...aiResult,
+          timeline,
+        }),
         confidence: lastConfidence,
       },
     });
 
-    // 回傳自然語言 summary
+    //  回傳乾淨 API 結構
     res.status(200).json({
       success: true,
-      summary: jsonToTextSummary(aiResult, timeline),
+      overview: {
+        totalPoints: aiResult.totalPoints,
+        totalDistance: aiResult.totalDistance,
+        totalTime: aiResult.totalTime,
+        avgAccuracy: aiResult.avgAccuracy,
+        motionStatus: aiResult.motionStatus,
+        anomalies: aiResult.anomalies,
+      },
+      timeline,
+      lastLocation: aiResult.lastLocation,
+      confidence: lastConfidence,
     });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error('AI Report Error:', err);
+    res.status(500).json({
+      message: 'Internal Server Error',
+    });
   }
 });
 
