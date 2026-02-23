@@ -5,7 +5,7 @@ export interface AiResult {
 }
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // 環境變數設定
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export const aiAdapter = async (trackDetails: any[]): Promise<AiResult> => {
